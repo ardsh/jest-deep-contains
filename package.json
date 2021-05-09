@@ -1,0 +1,21 @@
+{
+  "name": "jest-deep-contains",
+  "version": "0.0.1",
+  "description": "Typed flexible matchers for jest",
+  "main": "dist/index.js",
+  "repository": "https://github.com/ardsh/jest-deep-contains.git",
+  "author": "ardsh",
+  "license": "MIT",
+  "private": false,
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "types": "./index.d.ts",
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.6",
+    "typescript": "^4.2.4"
+  }
+}
