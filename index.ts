@@ -15,7 +15,7 @@ expect.extend({
         const isContain = Array.isArray(actual) && !Array.isArray(expected);
         try {
             expect(actual)[isContain ? "toContainEqual" : "toEqual"](deepObjContaining(expected));
-        } catch (e) {
+        } catch (e: any) {
             return {
                 // message: () => this.utils.diff(expected, actual) || e.message,
                 message: () => diff(isContain ? [expected] : expected, actual) || e.message,
@@ -40,7 +40,7 @@ expect.extend({
     },
     asString(actual: any, expected: string | RegExp) {
         const toString = actual?.toISOString?.() || actual?.toString();
-        const pass = !!(toString.match(expected));
+        const pass = toString && !!(toString.match(expected));
         const message = pass ?
             () => `expected ${actual} not to equal ${expected}` :
             () => `expected ${actual} to equal ${expected}`;
@@ -54,7 +54,7 @@ expect.extend({
     expect(actual, matcher, ...args) {
         try {
             (<any>expect)(actual)[matcher](...args);
-        } catch (e) {
+        } catch (e: any) {
             return {
                 message: e.message,
                 pass: false,
