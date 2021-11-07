@@ -1,14 +1,14 @@
 {
   "name": "jest-deep-contains",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Typed flexible matchers for jest",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "repository": "https://github.com/ardsh/jest-deep-contains.git",
   "author": "ardsh",
   "license": "MIT",
   "private": false,
   "files": [
-    "dist",
+    "lib",
     "index.d.ts"
   ],
   "types": "./index.d.ts",

@@ -3,5 +3,6 @@
 .vscode/
 .history/
 dist/
+lib/
 *.log
 node_modules

@@ -20,7 +20,7 @@ export function deepObjContaining(obj: any): any {
 }
 
 
-interface TesterConfig<TData, TSetup> {
+export interface TesterConfig<TData, TSetup> {
     run: (data: TData) => Promise<any>,
     //TODO: Add partial inference when available
     setup?: (tests: TData[]) => Promise<TSetup> | TSetup,
