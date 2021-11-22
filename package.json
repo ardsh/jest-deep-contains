@@ -1,16 +1,24 @@
 {
   "name": "jest-deep-contains",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Typed flexible matchers for jest",
-  "main": "lib/index.js",
+  "main": "index.js",
   "repository": "https://github.com/ardsh/jest-deep-contains.git",
   "author": "ardsh",
   "license": "MIT",
   "private": false,
   "files": [
-    "lib",
-    "index.d.ts"
+    "index.js",
+    "index.d.ts",
+    "utils.js",
+    "utils.d.ts"
   ],
+  "scripts": {
+      "prebuild": "rm -rf ./lib && mkdir -p lib",
+      "build": "npm run prebuild && tsc && npm run postbuild",
+      "postbuild": "cp package.json index.d.ts ./lib",
+      "release": "npm publish lib"
+  },
   "types": "./index.d.ts",
   "devDependencies": {
     "@types/jest": "^26.0.23",
