@@ -21,7 +21,7 @@ export function deepObjContaining(obj: any): any {
 
 
 export interface TesterConfig<TData, TSetup={}, TBefore={}> {
-    run: (data: TData, context: TSetup & TBefore) => any,
+    run: (data: TData, context: TSetup & TBefore & { run: (data?: TData, context?: TSetup & TBefore) => any }) => any,
     beforeEach?: (data: TData, context: TSetup) => Promise<TBefore>,
     setup?: (tests: TData[]) => Promise<TSetup> | TSetup,
     teardown?: (ctx: TSetup, tests: TData[]) => any,
@@ -30,6 +30,7 @@ export interface TesterConfig<TData, TSetup={}, TBefore={}> {
 interface Test<TData> {
     run?: (data: TData, ctx?: any) => any,
     data: TData,
+    focused?: boolean,
     text: string,
 }
 
@@ -47,15 +48,14 @@ export const makeTester = <TSetup, TPData extends object>(conf?: Omit<TesterConf
             const test = {
                 text,
                 data,
+                focused: false,
                 run,
             }
             tests.push(test);
             return {
                 ...self,
                 focus: () => {
-                    const index = tests.indexOf(test);
-                    tests.splice(0, index);
-                    tests.splice(1, 1000);
+                    test.focused = true;
                 },
                 skip: () => {
                     tests.splice(tests.indexOf(test), 1);
@@ -66,6 +66,9 @@ export const makeTester = <TSetup, TPData extends object>(conf?: Omit<TesterConf
         runTests: <TPSetup=TSetup, TPBefore=TBefore>(overconf?: Partial<TesterConfig<TData, TPSetup, TPBefore>>) => {
             let setup = Promise.resolve(null as any);
             const setupFunc = overconf?.setup || conf?.setup;
+            if (tests.some(test => test.focused)) {
+                tests = tests.filter(test => test.focused);
+            }
             if (setupFunc) {
                 beforeAll(() => setup = Promise.resolve(setupFunc(tests.map(t => t.data))));
             }
@@ -77,12 +80,15 @@ export const makeTester = <TSetup, TPData extends object>(conf?: Omit<TesterConf
                 const beforeSingle = overconf?.beforeEach || config?.beforeEach || conf?.beforeEach;
                 let ctx = await beforeSingle?.(test.data, await setup);
                 const runFunc = test.run || overconf?.run || config?.run;
+                const ctxRun = test.run ? overconf?.run ? overconf?.run : config?.run : config?.run;
                 if (typeof runFunc !== 'function') {
                     expect(test).toEqual(expect.objectContaining({
-                        run: expect.anything(),
+                        run: expect.any(Function),
                     }));
                 }
-                return runFunc!(test.data, { ...await setup, ...ctx });
+                const context = { ...await setup, ...ctx };
+                context.run = (data=test.data, ctx=context) => ctxRun?.(data, ctx);
+                return runFunc!(test.data, context);
             }));
         }
     }
