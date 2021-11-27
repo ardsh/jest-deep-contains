@@ -34,15 +34,25 @@ interface Test<TData> {
     text: string,
 }
 
+export interface TesterResult<TData, TSetup, TBefore> {
+    clearTests: (pattern?: string | RegExp) => TesterResult<TData, TSetup, TBefore>,
+    addTest: (text: string, data: TData, run?: TesterConfig<TData, TSetup, TBefore>["run"]) => TesterResult<TData, TSetup, TBefore> & {
+        focus: () => TesterResult<TData, TSetup, TBefore>,
+        skip: () => TesterResult<TData, TSetup, TBefore>,
+    },
+    runTests: <TPSetup=TSetup, TPBefore=TBefore>(overconf?: Partial<TesterConfig<TData, TPSetup, TPBefore>>) => void,
+}
+
 export const makeTester = <TSetup, TPData extends object>(conf?: Omit<TesterConfig<any, TSetup>, "run">) => <TData extends object=TPData, TBefore={}>(config?: Partial<Pick<TesterConfig<TData, TSetup, TBefore>, "run" | "beforeEach">>) => {
     let tests: Test<TData>[] = [];
     config = {
         ...conf,
         ...config,
     } as any;
-    const self = {
-        clearTests: (match?: string | RegExp) => {
-            tests = !match ? [] : tests.filter(test => !test.text.match(match));
+    const self: TesterResult<TData, TSetup, TBefore> = {
+        clearTests: (pattern?: string | RegExp) => {
+            tests = !pattern ? [] : tests.filter(test => !test.text.match(pattern));
+            return self;
         },
         addTest: (text: string, data: TData, run?: TesterConfig<TData, TSetup, TBefore>["run"]) => {
             const test = {
@@ -56,6 +66,7 @@ export const makeTester = <TSetup, TPData extends object>(conf?: Omit<TesterConf
                 ...self,
                 focus: () => {
                     test.focused = true;
+                    return self;
                 },
                 skip: () => {
                     tests.splice(tests.indexOf(test), 1);
