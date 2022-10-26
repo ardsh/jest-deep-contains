@@ -1,5 +1,4 @@
-import diff from 'jest-diff';
-import { equals } from 'expect/build/jasmineUtils';
+import { equals } from '@jest/expect-utils';
 import { deepObjContaining } from "./utils";
 
 export type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
@@ -18,7 +17,7 @@ expect.extend({
         } catch (e: any) {
             return {
                 // message: () => this.utils.diff(expected, actual) || e.message,
-                message: () => diff(isContain ? [expected] : expected, actual) || e.message,
+                message: () => this.utils.diff(isContain ? [expected] : expected, actual) || e.message,
                 pass: false,
             }
         }
@@ -32,7 +31,7 @@ expect.extend({
         return { pass, message: () => pass ?
             `Expected ${this.utils.printReceived(actual)} not to ${
                 isContain ? "contain" : "equal"} ${this.utils.printExpected(expected)}` :
-            diff(isContain ? [expected] : expected, actual) || actual };
+            this.utils.diff(isContain ? [expected] : expected, actual) || actual };
     },
     parseJSON(actual: string, expected: any) {
         const pass = equals(JSON.parse(actual), expected);
